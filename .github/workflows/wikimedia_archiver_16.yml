@@ -11,7 +11,8 @@ jobs:
     steps:
     - name: Archive Wikimedia Commons Items
       run: |
-        i=$((github.run_number * 20 + 16))
+        num=${{github.run_number}}
+        i = $((num * 20 + 16))
 
         api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
 

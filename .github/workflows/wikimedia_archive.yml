@@ -17,46 +17,39 @@ jobs:
         start_number=${{ github.event.inputs.start-number }}
 
         for ((i = $start_number; i < $start_number + 10; i++)); do
-          echo 1
+          echo "Processing item $i"
+
           api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
 
           # Retrieve information about the item
           response=$(curl -sS $api_url)
 
-          echo 2
-
           # Extract descriptionurl
-          description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+')
-
-          echo 3
+          description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+' || true)
 
           # Archive the descriptionurl
           if [ -n "$description_url" ]; then
-            echo 3.5
-            curl -sS "https://web.archive.org/save/$description_url"
+            curl -sS "https://web.archive.org/save/$description_url" || true
           fi
 
-          echo 4
-
           # Extract outlinks
-          outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http")
+          outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http" || true)
 
           # Archive each outlink
           for outlink in $outlinks; do
-            curl -sS "https://web.archive.org/save/$outlink"
+            curl -sS "https://web.archive.org/save/$outlink" || true
           done
 
-          echo 5
-
           # Archive descriptionshorturl
-          description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+')
+          description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+' || true)
           if [ -n "$description_shorturl" ]; then
-            curl -sS "https://web.archive.org/save/$description_shorturl"
+            curl -sS "https://web.archive.org/save/$description_shorturl" || true
           fi
 
           # Archive the image URL
-          image_url=$(echo $response | grep -oP '"url":"\K[^"]+')
+          image_url=$(echo $response | grep -oP '"url":"\K[^"]+' || true)
           if [ -n "$image_url" ]; then
-            curl -sS "https://web.archive.org/save/$image_url"
+            curl -sS "https://web.archive.org/save/$image_url" || true
           fi
         done
+      continue-on-error: true

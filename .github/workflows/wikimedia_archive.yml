@@ -19,9 +19,6 @@ jobs:
 
         api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
 
-        # Echo the API URL
-        echo "API URL: $api_url"
-
         # Retrieve information about the item and suppress output
         response=$(curl -sS $api_url)
 

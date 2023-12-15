@@ -1,2 +1,2 @@
-# Wikimedia-Commons-Archive
+# Wikimedia-Archiver
 Archiving the Wikimedia Commons.

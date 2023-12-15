@@ -33,6 +33,8 @@ jobs:
             curl -sS "https://web.archive.org/save/$description_url"
           fi
 
+          echo 3
+
           # Extract outlinks
           outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http")
 
@@ -40,6 +42,8 @@ jobs:
           for outlink in $outlinks; do
             curl -sS "https://web.archive.org/save/$outlink"
           done
+
+          echo 4
 
           # Archive descriptionshorturl
           description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+')

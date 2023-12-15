@@ -3,8 +3,8 @@ name: Wikimedia Archive
 on:
   workflow_dispatch:
     inputs:
-      item_number:
-        description: 'Start number for Wikimedia Commons items'
+      item-number:
+        description: 'Item number'
         required: true
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     steps:
     - name: Archive Wikimedia Commons Items
       run: |
-        start_number=${{ github.event.inputs.start-number }}
+        start_number=${{ github.event.inputs.item-number }}
         i=$start_number
 
         api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"

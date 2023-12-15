@@ -25,29 +25,28 @@ jobs:
         # Retrieve information about the item and suppress output
         response=$(curl -sS $api_url)
 
-        # Extract and archive descriptionurl
-        description_url=$(echo $response | jq -r '.query.pages.'$i'.imageinfo[0].descriptionurl' || true)
+        # Echo the descriptionurl and Archive it
+        description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+' || true)
         [ -n "$description_url" ] && echo "Description URL: $description_url" && curl -sS "https://web.archive.org/save/$description_url" > /dev/null || true
 
-        # Extract and archive outlinks
-        outlinks=$(echo $response | jq -r '.query.pages.'$i'.imageinfo[0].metadata[] | select(.name == "commonswiki" and .value != "") | .value' || true)
-        IFS=$'\n' # Set Internal Field Separator to newline
+        # Echo each outlink and Archive it
+        outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http" || true)
         for outlink in $outlinks; do
           echo "Outlink: $outlink" && curl -sS "https://web.archive.org/save/$outlink" > /dev/null || true
         done
 
-        # Extract and archive descriptionshorturl
-        description_shorturl=$(echo $response | jq -r '.query.pages.'$i'.imageinfo[0].descriptionshorturl' || true)
+        # Echo the descriptionshorturl and Archive it
+        description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+' || true)
         [ -n "$description_shorturl" ] && echo "Description Short URL: $description_shorturl" && curl -sS "https://web.archive.org/save/$description_shorturl" > /dev/null || true
 
-        # Extract and archive image URL
-        image_url=$(echo $response | jq -r '.query.pages.'$i'.imageinfo[0].url' || true)
+        # Echo the image URL and Archive it
+        image_url=$(echo $response | grep -oP '"url":"\K[^"]+' || true)
         [ -n "$image_url" ] && echo "Image URL: $image_url" && curl -sS "https://web.archive.org/save/$image_url" > /dev/null || true
 
-        # Archive the original Wikimedia Commons item page URL
+        # Echo the original Wikimedia Commons item page URL and Archive it
         item_page_url="https://commons.wikimedia.org/w/index.php?curid=$i"
         echo "Item Page URL: $item_page_url" && curl -sS "https://web.archive.org/save/$item_page_url" > /dev/null || true
 
-        # Archive the API URL
+        # Echo the API URL again and Archive it
         echo "API URL: $api_url" && curl -sS "https://web.archive.org/save/$api_url" > /dev/null || true
       continue-on-error: true

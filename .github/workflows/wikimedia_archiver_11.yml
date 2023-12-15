@@ -12,7 +12,7 @@ jobs:
     - name: Archive Wikimedia Commons Items
       run: |
         num=${{github.run_number}}
-        i = $((num * 20 + 11))
+        i=$((num * 20 + 11))
 
         api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
 

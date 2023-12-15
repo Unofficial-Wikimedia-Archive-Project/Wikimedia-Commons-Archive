@@ -17,10 +17,13 @@ jobs:
         start_number=${{ github.event.inputs.start-number }}
 
         for ((i = $start_number; i < $start_number + 10; i++)); do
+          echo 1
           api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
 
           # Retrieve information about the item
           response=$(curl -sS $api_url)
+
+          echo 2
 
           # Extract descriptionurl
           description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+')

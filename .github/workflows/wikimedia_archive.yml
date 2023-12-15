@@ -28,12 +28,15 @@ jobs:
           # Extract descriptionurl
           description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+')
 
+          echo 3
+
           # Archive the descriptionurl
           if [ -n "$description_url" ]; then
+            echo 3.5
             curl -sS "https://web.archive.org/save/$description_url"
           fi
 
-          echo 3
+          echo 4
 
           # Extract outlinks
           outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http")
@@ -43,7 +46,7 @@ jobs:
             curl -sS "https://web.archive.org/save/$outlink"
           done
 
-          echo 4
+          echo 5
 
           # Archive descriptionshorturl
           description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+')

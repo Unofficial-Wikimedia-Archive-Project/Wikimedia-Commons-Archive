@@ -20,41 +20,35 @@ jobs:
 
           api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
 
+          # Echo the API URL
+          echo $api_url
+
           # Retrieve information about the item and suppress output
           response=$(curl -sS $api_url)
 
-          # Extract descriptionurl
+          # Echo the descriptionurl and Archive it
           description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+' || true)
+          [ -n "$description_url" ] && echo $description_url && curl -sS "https://web.archive.org/save/$description_url" > /dev/null || true
 
-          # Archive the descriptionurl and suppress output
-          if [ -n "$description_url" ]; then
-            curl -sS "https://web.archive.org/save/$description_url" > /dev/null || true
-          fi
-
-          # Extract outlinks
+          # Echo each outlink and Archive it
           outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http" || true)
-
-          # Archive each outlink and suppress output
           for outlink in $outlinks; do
-            curl -sS "https://web.archive.org/save/$outlink" > /dev/null || true
+            echo $outlink && curl -sS "https://web.archive.org/save/$outlink" > /dev/null || true
           done
 
-          # Archive descriptionshorturl and suppress output
+          # Echo the descriptionshorturl and Archive it
           description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+' || true)
-          if [ -n "$description_shorturl" ]; then
-            curl -sS "https://web.archive.org/save/$description_shorturl" > /dev/null || true
-          fi
+          [ -n "$description_shorturl" ] && echo $description_shorturl && curl -sS "https://web.archive.org/save/$description_shorturl" > /dev/null || true
 
-          # Archive the image URL and suppress output
+          # Echo the image URL and Archive it
           image_url=$(echo $response | grep -oP '"url":"\K[^"]+' || true)
-          if [ -n "$image_url" ]; then
-            curl -sS "https://web.archive.org/save/$image_url" > /dev/null || true
-          fi
+          [ -n "$image_url" ] && echo $image_url && curl -sS "https://web.archive.org/save/$image_url" > /dev/null || true
 
-          # Archive the original Wikimedia Commons item page and suppress output
-          curl -sS "https://web.archive.org/save/https://commons.wikimedia.org/w/index.php?curid=$i" > /dev/null || true
+          # Echo the original Wikimedia Commons item page URL and Archive it
+          item_page_url="https://commons.wikimedia.org/w/index.php?curid=$i"
+          echo $item_page_url && curl -sS "https://web.archive.org/save/$item_page_url" > /dev/null || true
 
-          # Archive the API URL and suppress output
-          curl -sS "https://web.archive.org/save/$api_url" > /dev/null || true
+          # Echo the API URL and Archive it
+          echo $api_url && curl -sS "https://web.archive.org/save/$api_url" > /dev/null || true
         done
       continue-on-error: true

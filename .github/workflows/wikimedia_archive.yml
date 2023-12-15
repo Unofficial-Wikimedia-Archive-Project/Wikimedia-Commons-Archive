@@ -51,5 +51,11 @@ jobs:
           if [ -n "$image_url" ]; then
             curl -sS "https://web.archive.org/save/$image_url" || true
           fi
+
+          # Archive the original Wikimedia Commons item page
+          curl -sS "https://web.archive.org/save/https://commons.wikimedia.org/w/index.php?curid=$i" || true
+
+          # Archive the API URL
+          curl -sS "https://web.archive.org/save/$api_url" || true
         done
       continue-on-error: true

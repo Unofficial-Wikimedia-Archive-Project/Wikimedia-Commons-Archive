@@ -1,0 +1,45 @@
+name: Wikimedia Archive
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  archive_commons_items:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Archive Wikimedia Commons Items
+      run: |
+        i=$((github.run_number * 20 + 9))
+
+        api_url="https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&pageids=$i"
+
+        # Retrieve information about the item and suppress output
+        response=$(curl -sS $api_url)
+
+        # Echo the descriptionurl and Archive it
+        description_url=$(echo $response | grep -oP '"descriptionurl":"\K[^"]+' || true)
+        [ -n "$description_url" ] && echo "Description URL: $description_url" && curl -sS "https://web.archive.org/save/$description_url" > /dev/null || true
+
+        # Echo each outlink and Archive it
+        outlinks=$(echo $response | grep -oP '"href":"\K[^"]+' | grep -v "^http" || true)
+        for outlink in $outlinks; do
+          echo "Outlink: $outlink" && curl -sS "https://web.archive.org/save/$outlink" > /dev/null || true
+        done
+
+        # Echo the descriptionshorturl and Archive it
+        description_shorturl=$(echo $response | grep -oP '"descriptionshorturl":"\K[^"]+' || true)
+        [ -n "$description_shorturl" ] && echo "Description Short URL: $description_shorturl" && curl -sS "https://web.archive.org/save/$description_shorturl" > /dev/null || true
+
+        # Echo the image URL and Archive it
+        image_url=$(echo $response | grep -oP '"url":"\K[^"]+' || true)
+        [ -n "$image_url" ] && echo "Image URL: $image_url" && curl -sS "https://web.archive.org/save/$image_url" > /dev/null || true
+
+        # Echo the original Wikimedia Commons item page URL and Archive it
+        item_page_url="https://commons.wikimedia.org/w/index.php?curid=$i"
+        echo "Item Page URL: $item_page_url" && curl -sS "https://web.archive.org/save/$item_page_url" > /dev/null || true
+
+        # Echo the API URL again and Archive it
+        echo "API URL: $api_url" && curl -sS "https://web.archive.org/save/$api_url" > /dev/null || true
+      continue-on-error: true

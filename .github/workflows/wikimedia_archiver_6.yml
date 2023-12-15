@@ -1,4 +1,4 @@
-name: Wikimedia Archive
+name: Wikimedia Archive %6
 
 on:
   schedule:
